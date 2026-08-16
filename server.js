@@ -52,18 +52,18 @@ app.use((err, req, res, next) => {
 });
 
 async function start() {
-  // Database seeding can be slow. Defer it so we start listening ASAP,
-  // but await it before the server fully transitions to "healthy" so we
-  // don't serve API requests against a half-seeded database.
-  // (The lazy initDbConnection means the connection itself is also deferred.)
-  db.initializeDb().catch((err) => {
-    console.error('Failed to initialize database:', err);
-    process.exit(1);
-  });
+// Database seeding can be slow. Defer it so we start listening ASAP,
+// but await it before the server fully transitions to "healthy" so we
+// don't serve API requests against a half-seeded database.
+// (The lazy initializeDb() connection means the connection itself is also deferred.)
+db.initializeDb().catch((err) => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
+});
 
-  app.listen(PORT, () => {
-    console.log(`FireGuard Supply Co. server running at http://localhost:${PORT}`);
-  });
+app.listen(PORT, () => {
+  console.log(`FireGuard Supply Co. server running at http://localhost:${PORT}`);
+});
 }
 
 start().catch((err) => {

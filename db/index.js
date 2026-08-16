@@ -100,7 +100,6 @@ function seedSync() {
     console.log(`Seeded ${seedProducts.length} products.`);
   }
 }
-
 // Defer seeding to avoid blocking module load / require() chain.
 // The database connection itself is initialized lazily on first use,
 // and seeding happens asynchronously via setImmediate, so the app
