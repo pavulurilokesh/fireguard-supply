@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIREGUARD SUPPLY CO.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#1c1e1f;
+    --charcoal-2:#26292b;
+    --cream:#f5f2ec;
+    --paper:#fbfaf7;
+    --fire:#d2361d;
+    --fire-dark:#a82813;
+    --amber:#f5a623;
+    --steel:#5b6570;
+    --steel-light:#8a929b;
+    --green:#2f7d4f;
+    --line:#dedad0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Inter',sans-serif;background:var(--cream);color:var(--charcoal);}
+  h1,h2,h3,.display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select{font-family:inherit;}
+  a{color:inherit;}
+
+  .hazard{height:10px;background:repeating-linear-gradient(135deg,var(--fire) 0 18px,var(--amber) 18px 36px);}
+  .hazard.thin{height:5px;}
+
+  header.topbar{background:var(--charcoal);color:var(--cream);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:38px;height:38px;flex:none;}
+  .brand-text .name{font-size:22px;font-weight:700;line-height:1;}
+  .brand-text .tag{font-size:10.5px;color:var(--steel-light);letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif;margin-top:3px;}
+  nav.topnav{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .navbtn{background:transparent;border:1px solid transparent;color:var(--cream);padding:8px 14px;border-radius:2px;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
+  .navbtn:hover{border-color:#3a3d3f;}
+  .navbtn.active{background:var(--fire);color:#fff;}
+  .navbtn.ghost{color:var(--steel-light);}
+  .cartcount{background:var(--amber);color:var(--charcoal);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;margin-left:6px;}
+
+  main{max-width:1180px;margin:0 auto;padding:36px 32px 80px;}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:2px;border:none;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;}
+  .btn-primary{background:var(--fire);color:#fff;}
+  .btn-primary:hover{background:var(--fire-dark);}
+  .btn-dark{background:var(--charcoal);color:var(--cream);}
+  .btn-dark:hover{background:#000;}
+  .btn-outline{background:transparent;border:1.5px solid var(--charcoal);color:var(--charcoal);}
+  .btn-outline:hover{background:var(--charcoal);color:#fff;}
+  .btn-sm{padding:7px 12px;font-size:11.5px;}
+  .btn-danger{background:transparent;color:var(--fire);border:1.5px solid var(--fire);}
+  .btn-danger:hover{background:var(--fire);color:#fff;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  .authwrap{min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;background:var(--charcoal);padding:40px 20px;}
+  .authcard{background:var(--paper);width:100%;max-width:400px;border-radius:2px;overflow:hidden;}
+  .authcard-body{padding:34px 32px 32px;}
+  .authcard h2{font-size:24px;margin:14px 0 4px;}
+  .authcard p.sub{color:var(--steel);font-size:13px;margin:0 0 22px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);margin-bottom:6px;}
+  .field input,.field select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:2px;font-size:14px;background:#fff;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--fire);}
+  .field .hint{font-size:11.5px;color:var(--steel-light);margin-top:5px;}
+  .authswitch{margin-top:18px;font-size:13px;color:var(--steel);text-align:center;}
+  .authswitch button{background:none;border:none;color:var(--fire);font-weight:600;text-decoration:underline;padding:0;}
+  .msg{padding:10px 12px;border-radius:2px;font-size:13px;margin-bottom:16px;}
+  .msg.err{background:#fbe8e4;color:var(--fire-dark);}
+  .msg.ok{background:#e7f3ea;color:var(--green);}
+  .demo-note{font-size:11.5px;color:var(--steel-light);margin-top:16px;line-height:1.5;border-top:1px solid var(--line);padding-top:14px;}
+
+  .shop-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;margin-bottom:8px;}
+  .shop-head h1{font-size:30px;margin:0 0 4px;}
+  .shop-head p{margin:0;color:var(--steel);font-size:14px;}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0;}
+  .toolbar input{padding:10px 12px;border:1.5px solid var(--line);border-radius:2px;font-size:13.5px;background:#fff;flex:1;min-width:180px;}
+  .catpill{padding:8px 14px;border:1.5px solid var(--line);border-radius:20px;font-size:12.5px;font-weight:600;background:#fff;text-transform:uppercase;letter-spacing:0.03em;}
+  .catpill.active{background:var(--charcoal);color:#fff;border-color:var(--charcoal);}
+  .catrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px;}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:3px;overflow:hidden;display:flex;flex-direction:column;}
+  .card-icon{height:120px;display:flex;align-items:center;justify-content:center;}
+  .card-icon svg{width:52px;height:52px;}
+  .card-body{padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px;flex:1;}
+  .card-cat{font-size:10.5px;font-weight:700;letter-spacing:0.08em;color:var(--fire);text-transform:uppercase;}
+  .card-title{font-size:15.5px;font-weight:600;line-height:1.3;margin:0;font-family:'Inter',sans-serif;}
+  .card-sku{font-size:11px;color:var(--steel-light);}
+  .card-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px;}
+  .price{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:17px;}
+  .tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:3px 8px;border-radius:20px;display:inline-block;}
+  .tag.instock{background:#e7f3ea;color:var(--green);}
+  .tag.low{background:#fdf1de;color:#a5690a;}
+  .tag.out{background:#fbe8e4;color:var(--fire-dark);}
+
+  .cartline{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);}
+  .cartline .ci-icon{width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:2px;}
+  .cartline .ci-icon svg{width:26px;height:26px;}
+  .cartline .ci-name{font-weight:600;font-size:14.5px;}
+  .cartline .ci-sku{font-size:11px;color:var(--steel-light);}
+  .qtybox{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:2px;}
+  .qtybox button{background:none;border:none;width:28px;height:28px;font-size:15px;font-weight:700;}
+  .qtybox span{width:30px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .cart-summary{background:var(--paper);border:1px solid var(--line);padding:22px;border-radius:3px;margin-top:20px;}
+  .sumrow{display:flex;justify-content:space-between;font-size:14px;margin-bottom:10px;}
+  .sumrow.total{font-weight:700;font-size:18px;padding-top:10px;border-top:1px solid var(--line);}
+
+  .admin-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:22px;}
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:26px;}
+  .stat{background:var(--charcoal);color:var(--cream);padding:18px 20px;border-radius:3px;}
+  .stat .num{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;}
+  .stat .lbl{font-size:11px;color:var(--steel-light);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
+  .stat.warn{background:var(--fire);}
+  table.admtable{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);}
+  table.admtable th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:0.06em;color:var(--steel);padding:12px 14px;border-bottom:2px solid var(--charcoal);}
+  table.admtable td{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  table.admtable input{width:90px;padding:6px 8px;border:1.5px solid var(--line);border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:13px;}
+  .prodname-cell{display:flex;align-items:center;gap:10px;}
+  .prodname-cell .pic{width:34px;height:34px;border-radius:2px;flex:none;display:flex;align-items:center;justify-content:center;}
+  .prodname-cell svg{width:18px;height:18px;}
+
+  .addform{background:var(--paper);border:1px solid var(--line);padding:22px;border-radius:3px;margin-bottom:26px;}
+  .addform h3{font-size:15px;margin:0 0 16px;}
+  .formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:14px;}
+
+  .empty{text-align:center;padding:60px 20px;color:var(--steel);}
+  .empty svg{width:44px;height:44px;margin-bottom:12px;opacity:0.5;}
+
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--charcoal);color:#fff;padding:12px 22px;border-radius:2px;font-size:13.5px;font-weight:600;z-index:999;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,0.25);max-width:90vw;}
+  .toast.err{background:var(--fire-dark);}
+  .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--amber);flex:none;}
+
+  @media(max-width:640px){
+    header.topbar{padding:14px 16px;}
+    main{padding:22px 16px 60px;}
+    .shop-head h1{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const API = '/api';
+
+/* ---------------- ICONS ---------------- */
+const ICONS = {
+  extinguisher: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="6" width="6" height="6" rx="1" fill="currentColor"/><rect x="14" y="12" width="20" height="26" rx="4" fill="currentColor"/><rect x="10" y="14" width="6" height="4" rx="1" fill="currentColor" transform="rotate(-20 10 14)"/><rect x="21" y="2" width="6" height="5" rx="1" fill="currentColor"/><path d="M8 20 Q2 22 4 30" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+  alarm: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="16" fill="currentColor"/><circle cx="24" cy="24" r="6" fill="var(--cream)"/><path d="M24 4v5M24 39v5M44 24h-5M9 24H4" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>`,
+  hose: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 38 Q6 22 18 22 Q30 22 30 12 Q30 6 24 6" stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="24" cy="6" r="5" fill="currentColor"/><rect x="2" y="35" width="10" height="8" rx="2" fill="currentColor"/></svg>`,
+  sprinkler: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="21" y="4" width="6" height="14" fill="currentColor"/><circle cx="24" cy="22" r="6" fill="currentColor"/><path d="M12 34 Q24 26 36 34 M8 40 Q24 30 40 40" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+  ppe: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4 L40 10 V22 C40 34 32 42 24 45 C16 42 8 34 8 22 V10 Z" fill="currentColor"/><path d="M18 24 L22 29 L31 18" stroke="var(--cream)" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  hydrant: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="14" width="12" height="24" rx="3" fill="currentColor"/><rect x="12" y="18" width="6" height="6" rx="2" fill="currentColor"/><rect x="30" y="18" width="6" height="6" rx="2" fill="currentColor"/><circle cx="24" cy="10" r="6" fill="currentColor"/><rect x="16" y="38" width="16" height="4" rx="1" fill="currentColor"/></svg>`,
+  default: `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="8" width="32" height="32" rx="4" fill="currentColor"/></svg>`
+};
+const flameLogo = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M24 4 C24 4 34 14 34 24 C34 32.5 29.7 38 24 38 C18.3 38 14 32.5 14 24 C14 20 16 17 16 17 C16 17 17 20 19 21 C19 21 18 12 24 4Z" fill="#D2361D"/>
+  <path d="M24 18 C24 18 28 23 28 27.5 C28 31.6 26.2 34 24 34 C21.8 34 20 31.6 20 27.5 C20 25.5 21 24 21 24 C21 24 21.3 25.3 22.2 25.8 C22.2 25.8 21.7 21 24 18Z" fill="#F5A623"/>
+</svg>`;
+
+const CATEGORIES = [
+  {id:'extinguisher', label:'Fire Extinguishers'},
+  {id:'alarm', label:'Smoke & Heat Alarms'},
+  {id:'hose', label:'Hoses & Reels'},
+  {id:'sprinkler', label:'Sprinkler Systems'},
+  {id:'ppe', label:'PPE & Safety Gear'},
+  {id:'hydrant', label:'Hydrants & Accessories'}
+];
+function catLabel(id){ const c = CATEGORIES.find(c=>c.id===id); return c ? c.label : id; }
+function fmt(n){ return '$' + Number(n).toFixed(2); }
+function stockTag(stock){
+  if(stock<=0) return `<span class="tag out">Out of stock</span>`;
+  if(stock<=8) return `<span class="tag low">Low stock · ${stock} left</span>`;
+  return `<span class="tag instock">In stock · ${stock}</span>`;
+}
+function iconFor(cat){ return ICONS[cat] || ICONS.default; }
+function catColor(cat){
+  const map = {extinguisher:'#d2361d', alarm:'#f5a623', hose:'#5b6570', sprinkler:'#2f7d4f', ppe:'#a8281f', hydrant:'#8a4b1f'};
+  return map[cat] || '#5b6570';
+}
+function escapeAttr(s){ return (s||'').replace(/"/g,'&quot;'); }
+
+/* ---------------- STATE ---------------- */
+let state = {
+  view: 'login',
+  authMsg: null,
+  token: localStorage.getItem('fg_token') || null,
+  currentUser: null,
+  products: [],
+  orders: [],
+  cart: {}, // productId -> qty
+  search: '',
+  activeCat: 'all',
+  loaded: false,
+  toast: null,
+  busy: false
+};
+
+/* ---------------- API HELPER ---------------- */
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+  const res = await fetch(API + path, { ...opts, headers });
+  let data = null;
+  try { data = await res.json(); } catch (e) { /* no body */ }
+  if (!res.ok) {
+    const message = (data && data.error) || `Request failed (${res.status})`;
+    throw new Error(message);
+  }
+  return data;
+}
+
+/* ---------------- INIT / SESSION ---------------- */
+async function init() {
+  if (state.token) {
+    try {
+      const { user } = await api('/auth/me');
+      state.currentUser = user;
+      state.view = user.role === 'admin' ? 'admin' : 'shop';
+    } catch (e) {
+      state.token = null;
+      localStorage.removeItem('fg_token');
+    }
+  }
+  await loadProducts();
+  if (state.currentUser) await loadOrders();
+  state.loaded = true;
+  render();
+}
+
+async function loadProducts() {
+  try {
+    const { products } = await api('/products');
+    state.products = products;
+  } catch (e) { showToast(e.message, true); }
+}
+
+async function loadOrders() {
+  try {
+    const path = state.currentUser.role === 'admin' ? '/orders' : '/orders/mine';
+    const { orders } = await api(path);
+    state.orders = orders;
+  } catch (e) { showToast(e.message, true); }
+}
+
+/* ---------------- AUTH ---------------- */
+async function doLogin(username, password) {
+  state.busy = true; render();
+  try {
+    const { token, user } = await api('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    state.token = token;
+    localStorage.setItem('fg_token', token);
+    state.currentUser = user;
+    state.authMsg = null;
+    state.view = user.role === 'admin' ? 'admin' : 'shop';
+    await loadProducts();
+    await loadOrders();
+  } catch (e) {
+    state.authMsg = { type: 'err', text: e.message };
+  }
+  state.busy = false; render();
+}
+
+async function doSignup(username, password, confirm) {
+  if (password !== confirm) { state.authMsg = { type: 'err', text: 'Passwords do not match.' }; render(); return; }
+  state.busy = true; render();
+  try {
+    const { token, user } = await api('/auth/signup', { method: 'POST', body: JSON.stringify({ username, password }) });
+    state.token = token;
+    localStorage.setItem('fg_token', token);
+    state.currentUser = user;
+    state.authMsg = null;
+    state.view = 'shop';
+    await loadProducts();
+    await loadOrders();
+  } catch (e) {
+    state.authMsg = { type: 'err', text: e.message };
+  }
+  state.busy = false; render();
+}
+
+function doLogout() {
+  state.token = null;
+  localStorage.removeItem('fg_token');
+  state.currentUser = null;
+  state.cart = {};
+  state.orders = [];
+  state.view = 'login';
+  render();
+}
+
+/* ---------------- CART ---------------- */
+function cartCount(){ return Object.values(state.cart).reduce((a,b)=>a+b,0); }
+function addToCart(id){
+  const prod = state.products.find(p=>String(p.id)===String(id));
+  if(!prod || prod.stock<=0) return;
+  const inCart = state.cart[id]||0;
+  if(inCart>=prod.stock){ showToast('No more stock available for this item.', true); return; }
+  state.cart[id] = inCart+1;
+  showToast(prod.name + ' added to cart');
+}
+function changeQty(id, delta){
+  const prod = state.products.find(p=>String(p.id)===String(id));
+  let q = (state.cart[id]||0) + delta;
+  if(q<=0){ delete state.cart[id]; }
+  else if(prod && q>prod.stock){ q = prod.stock; state.cart[id]=q; }
+  else { state.cart[id]=q; }
+  render();
+}
+async function checkout(){
+  const items = Object.entries(state.cart).map(([id,qty])=>({ productId: Number(id), qty }));
+  if(items.length===0) return;
+  state.busy = true; render();
+  try {
+    await api('/orders', { method: 'POST', body: JSON.stringify({ items }) });
+    state.cart = {};
+    await loadProducts();
+    await loadOrders();
+    showToast('Order placed successfully!');
+    state.view = 'orders';
+  } catch (e) {
+    showToast(e.message, true);
+  }
+  state.busy = false; render();
+}
+
+/* ---------------- ADMIN ---------------- */
+async function updateProductField(id, field, value){
+  const body = {};
+  if(field==='price'){ const v=parseFloat(value); if(isNaN(v)||v<0) return; body.price=v; }
+  if(field==='stock'){ const v=parseInt(value); if(isNaN(v)||v<0) return; body.stock=v; }
+  try {
+    await api(`/products/${id}`, { method: 'PUT', body: JSON.stringify(body) });
+    await loadProducts();
+    showToast('Saved');
+  } catch (e) { showToast(e.message, true); await loadProducts(); }
+}
+async function deleteProduct(id){
+  if(!confirm('Delete this product? This cannot be undone.')) return;
+  try {
+    await api(`/products/${id}`, { method: 'DELETE' });
+    showToast('Product deleted');
+    await loadProducts();
+  } catch (e) { showToast(e.message, true); }
+  render();
+}
+async function addProduct(data){
+  try {
+    await api('/products', { method: 'POST', body: JSON.stringify(data) });
+    showToast('Product added to catalog');
+    await loadProducts();
+  } catch (e) { showToast(e.message, true); }
+  render();
+}
+
+/* ---------------- TOAST ---------------- */
+function showToast(msg, isErr){
+  state.toast = { msg, isErr: !!isErr };
+  render();
+  setTimeout(()=>{ state.toast=null; render(); }, 2600);
+}
+
+/* ---------------- RENDER ---------------- */
+function render(){
+  const app = document.getElementById('app');
+  if(!state.loaded){ app.innerHTML = `<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--charcoal);color:#fff;font-family:'Oswald',sans-serif;letter-spacing:0.08em;">LOADING FIREGUARD SUPPLY...</div>`; return; }
+
+  let html = '';
+  if(state.view==='login' || state.view==='signup'){
+    html = renderAuth();
+  } else {
+    html = renderHeader() + '<div class="hazard"></div><main>' + renderView() + '</main>';
+  }
+  if(state.toast) html += `<div class="toast ${state.toast.isErr?'err':''}"><span class="dot"></span>${state.toast.msg}</div>`;
+  app.innerHTML = html;
+  attachHandlers();
+}
+
+function renderHeader(){
+  const isAdmin = state.currentUser && state.currentUser.role==='admin';
+  return `
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">${flameLogo}</div>
+      <div class="brand-text">
+        <div class="name">FIREGUARD SUPPLY CO.</div>
+        <div class="tag">Certified Fire &amp; Life Safety Equipment</div>
+      </div>
+    </div>
+    <nav class="topnav">
+      ${isAdmin ? `
+        <button class="navbtn ${state.view==='admin'?'active':''}" data-nav="admin">Admin Dashboard</button>
+      ` : `
+        <button class="navbtn ${state.view==='shop'?'active':''}" data-nav="shop">Shop</button>
+        <button class="navbtn ${state.view==='cart'?'active':''}" data-nav="cart">Cart${cartCount()>0?`<span class="cartcount">${cartCount()}</span>`:''}</button>
+        <button class="navbtn ${state.view==='orders'?'active':''}" data-nav="orders">My Orders</button>
+      `}
+      <button class="navbtn ghost" data-nav="logout">Log out (${state.currentUser.username})</button>
+    </nav>
+  </header>`;
+}
+
+function renderView(){
+  if(state.currentUser.role==='admin') return renderAdmin();
+  if(state.view==='shop') return renderShop();
+  if(state.view==='cart') return renderCart();
+  if(state.view==='orders') return renderOrders();
+  return renderShop();
+}
+
+function renderAuth(){
+  const isSignup = state.view==='signup';
+  return `
+  <div class="authwrap">
+    <div class="authcard">
+      <div class="hazard thin"></div>
+      <div class="authcard-body">
+        <div class="brand-mark" style="width:44px;height:44px;">${flameLogo}</div>
+        <h2>${isSignup? 'Create an account' : 'Sign in'}</h2>
+        <p class="sub">${isSignup ? 'Register to browse and order fire safety equipment.' : 'Access the FireGuard Supply Co. ordering portal.'}</p>
+        ${state.authMsg ? `<div class="msg ${state.authMsg.type==='err'?'err':'ok'}">${state.authMsg.text}</div>` : ''}
+        <form id="authform">
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="f-username" autocomplete="username" required>
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="f-password" autocomplete="${isSignup?'new-password':'current-password'}" required minlength="${isSignup?8:1}">
+            ${isSignup ? `<div class="hint">At least 8 characters.</div>` : ''}
+          </div>
+          ${isSignup ? `
+          <div class="field">
+            <label>Confirm password</label>
+            <input type="password" id="f-confirm" required>
+          </div>` : ''}
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:6px;" ${state.busy?'disabled':''}>${state.busy ? 'Please wait...' : (isSignup?'Create account':'Sign in')}</button>
+        </form>
+        <div class="authswitch">
+          ${isSignup
+            ? `Already have an account? <button data-nav="login">Sign in</button>`
+            : `Need an account? <button data-nav="signup">Sign up</button>`}
+        </div>
+        <div class="demo-note">Passwords are hashed with bcrypt and never stored in plain text. Sessions use signed JWTs. On first run the server seeds one admin account from your <code>.env</code> file (default demo credentials: <strong>admin</strong> / <strong>change_this_password_123</strong> — change this immediately in production).</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderShop(){
+  const cats = ['all', ...CATEGORIES.map(c=>c.id)];
+  let filtered = state.products.filter(p=>{
+    const matchesCat = state.activeCat==='all' || p.category===state.activeCat;
+    const matchesSearch = !state.search || p.name.toLowerCase().includes(state.search.toLowerCase()) || p.sku.toLowerCase().includes(state.search.toLowerCase());
+    return matchesCat && matchesSearch;
+  });
+  return `
+    <div class="shop-head">
+      <div>
+        <h1>Equipment Catalog</h1>
+        <p>${state.products.length} products across ${CATEGORIES.length} categories · certified suppliers only</p>
+      </div>
+    </div>
+    <div class="toolbar">
+      <input type="text" id="searchbox" placeholder="Search by product name or SKU..." value="${escapeAttr(state.search)}">
+    </div>
+    <div class="catrow">
+      ${cats.map(c=>`<button class="catpill ${state.activeCat===c?'active':''}" data-cat="${c}">${c==='all'?'All Products':catLabel(c)}</button>`).join('')}
+    </div>
+    ${filtered.length===0 ? `<div class="empty">No products match your search.</div>` : `
+    <div class="grid">
+      ${filtered.map(p=>`
+        <div class="card">
+          <div class="card-icon" style="background:${catColor(p.category)}22;color:${catColor(p.category)};">${iconFor(p.category)}</div>
+          <div class="card-body">
+            <div class="card-cat">${catLabel(p.category)}</div>
+            <div class="card-title">${p.name}</div>
+            <div class="card-sku mono">SKU: ${p.sku}</div>
+            <div>${stockTag(p.stock)}</div>
+            <div class="card-bottom">
+              <div class="price">${fmt(p.price)}</div>
+              <button class="btn btn-primary btn-sm" data-addcart="${p.id}" ${p.stock<=0?'disabled':''}>${p.stock<=0?'Unavailable':'Add to cart'}</button>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>`}
+  `;
+}
+
+function renderCart(){
+  const items = Object.entries(state.cart).map(([id,qty])=>{
+    const p = state.products.find(p=>String(p.id)===String(id));
+    return p ? {...p, qty} : null;
+  }).filter(Boolean);
+  if(items.length===0){
+    return `<div class="empty">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="18" cy="40" r="3" fill="currentColor"/><circle cx="36" cy="40" r="3" fill="currentColor"/><path d="M4 6h6l5 26h24l4-18H12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>Your cart is empty.</div>
+      <div style="margin-top:14px;"><button class="btn btn-outline" data-nav="shop">Browse products</button></div>
+    </div>`;
+  }
+  const total = items.reduce((s,it)=>s+it.price*it.qty,0);
+  return `
+    <h1 style="font-size:26px;">Your Cart</h1>
+    <div>
+      ${items.map(it=>`
+        <div class="cartline">
+          <div class="ci-icon" style="background:${catColor(it.category)}22;color:${catColor(it.category)};">${iconFor(it.category)}</div>
+          <div style="flex:1;">
+            <div class="ci-name">${it.name}</div>
+            <div class="ci-sku mono">${it.sku} · ${fmt(it.price)} each</div>
+          </div>
+          <div class="qtybox">
+            <button data-qty="-1" data-id="${it.id}">−</button>
+            <span>${it.qty}</span>
+            <button data-qty="1" data-id="${it.id}">+</button>
+          </div>
+          <div style="width:80px;text-align:right;font-family:'JetBrains Mono',monospace;font-weight:700;">${fmt(it.price*it.qty)}</div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="cart-summary">
+      <div class="sumrow"><span>Subtotal</span><span>${fmt(total)}</span></div>
+      <div class="sumrow"><span>Shipping</span><span>Calculated at fulfillment</span></div>
+      <div class="sumrow total"><span>Total</span><span>${fmt(total)}</span></div>
+      <button class="btn btn-primary" id="checkoutbtn" style="width:100%;justify-content:center;margin-top:14px;" ${state.busy?'disabled':''}>${state.busy?'Placing order...':'Place Order'}</button>
+    </div>
+  `;
+}
+
+function renderOrders(){
+  const mine = state.orders;
+  const isAdmin = state.currentUser.role === 'admin';
+  if(mine.length===0){
+    return `<div class="empty">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="8" y="10" width="32" height="30" rx="2" stroke="currentColor" stroke-width="2.5" fill="none"/><path d="M14 20h20M14 27h20M14 34h12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div>No orders yet.</div>
+      <div style="margin-top:14px;"><button class="btn btn-outline" data-nav="shop">Browse products</button></div>
+    </div>`;
+  }
+  return `
+    <h1 style="font-size:26px;">${isAdmin ? 'All Orders' : 'My Orders'}</h1>
+    ${mine.map(o=>`
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:18px 20px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+          <div class="mono" style="font-size:12px;color:var(--steel);">Order #${o.id} ${isAdmin ? '· ' + o.username : ''} · ${new Date(o.created_at).toLocaleString()}</div>
+          <div style="font-weight:700;font-family:'JetBrains Mono',monospace;">${fmt(o.total)}</div>
+        </div>
+        ${o.items.map(it=>`<div style="font-size:13.5px;color:var(--steel);display:flex;justify-content:space-between;padding:3px 0;"><span>${it.qty} × ${it.name}</span><span>${fmt(it.price*it.qty)}</span></div>`).join('')}
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderAdmin(){
+  const totalStock = state.products.reduce((s,p)=>s+p.stock,0);
+  const lowStock = state.products.filter(p=>p.stock>0 && p.stock<=8).length;
+  const outStock = state.products.filter(p=>p.stock<=0).length;
+  const inventoryValue = state.products.reduce((s,p)=>s+p.price*p.stock,0);
+
+  return `
+    <div class="admin-head">
+      <h1 style="font-size:26px;margin:0;">Admin Dashboard</h1>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-outline btn-sm" data-nav="orders">View all orders</button>
+        <div style="font-size:12.5px;color:var(--steel);">Signed in as <strong>${state.currentUser.username}</strong></div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat"><div class="num mono">${state.products.length}</div><div class="lbl">Products listed</div></div>
+      <div class="stat"><div class="num mono">${totalStock}</div><div class="lbl">Units in stock</div></div>
+      <div class="stat"><div class="num mono">${fmt(inventoryValue)}</div><div class="lbl">Inventory value</div></div>
+      <div class="stat ${(lowStock+outStock)>0?'warn':''}"><div class="num mono">${lowStock+outStock}</div><div class="lbl">Low / out of stock</div></div>
+    </div>
+
+    <div class="addform">
+      <h3>Add New Product</h3>
+      <form id="addform">
+        <div class="formgrid">
+          <div class="field" style="margin-bottom:0;"><label>Product name</label><input type="text" id="new-name" required></div>
+          <div class="field" style="margin-bottom:0;"><label>SKU</label><input type="text" id="new-sku" required></div>
+          <div class="field" style="margin-bottom:0;"><label>Category</label>
+            <select id="new-category">${CATEGORIES.map(c=>`<option value="${c.id}">${c.label}</option>`).join('')}</select>
+          </div>
+          <div class="field" style="margin-bottom:0;"><label>Price (USD)</label><input type="number" step="0.01" min="0" id="new-price" required></div>
+          <div class="field" style="margin-bottom:0;"><label>Stock qty</label><input type="number" min="0" id="new-stock" required></div>
+        </div>
+        <div class="field"><label>Description</label><input type="text" id="new-desc" placeholder="Optional short description"></div>
+        <button type="submit" class="btn btn-dark">+ Add Product</button>
+      </form>
+    </div>
+
+    <h3 style="font-size:15px;margin-bottom:12px;">Inventory &amp; Pricing</h3>
+    <table class="admtable">
+      <thead><tr><th>Product</th><th>Category</th><th>SKU</th><th>Price</th><th>Stock</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        ${state.products.map(p=>`
+          <tr>
+            <td>
+              <div class="prodname-cell">
+                <div class="pic" style="background:${catColor(p.category)}22;color:${catColor(p.category)};">${iconFor(p.category)}</div>
+                <span>${p.name}</span>
+              </div>
+            </td>
+            <td>${catLabel(p.category)}</td>
+            <td class="mono">${p.sku}</td>
+            <td><input type="number" step="0.01" min="0" value="${p.price}" data-field="price" data-id="${p.id}"></td>
+            <td><input type="number" min="0" value="${p.stock}" data-field="stock" data-id="${p.id}"></td>
+            <td>${stockTag(p.stock)}</td>
+            <td><button class="btn btn-danger btn-sm" data-delete="${p.id}">Delete</button></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+/* ---------------- EVENT HANDLERS ---------------- */
+function attachHandlers(){
+  document.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const v = el.getAttribute('data-nav');
+      if(v==='logout'){ doLogout(); return; }
+      state.view = v;
+      state.authMsg = null;
+      if (v === 'orders' || v === 'admin') await loadOrders();
+      if (v === 'shop') await loadProducts();
+      render();
+    });
+  });
+
+  const authform = document.getElementById('authform');
+  if(authform){
+    authform.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const username = document.getElementById('f-username').value.trim();
+      const password = document.getElementById('f-password').value;
+      if(state.view==='signup'){
+        const confirm = document.getElementById('f-confirm').value;
+        doSignup(username, password, confirm);
+      } else {
+        doLogin(username, password);
+      }
+    });
+  }
+
+  const searchbox = document.getElementById('searchbox');
+  if(searchbox){
+    searchbox.addEventListener('input', (e)=>{
+      state.search = e.target.value;
+      render();
+      const el = document.getElementById('searchbox');
+      el.focus();
+      el.setSelectionRange(state.search.length, state.search.length);
+    });
+  }
+
+  document.querySelectorAll('[data-cat]').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.activeCat = el.getAttribute('data-cat'); render(); });
+  });
+
+  document.querySelectorAll('[data-addcart]').forEach(el=>{
+    el.addEventListener('click', ()=>{ addToCart(el.getAttribute('data-addcart')); render(); });
+  });
+
+  document.querySelectorAll('[data-qty]').forEach(el=>{
+    el.addEventListener('click', ()=>{ changeQty(el.getAttribute('data-id'), parseInt(el.getAttribute('data-qty'))); });
+  });
+
+  const checkoutbtn = document.getElementById('checkoutbtn');
+  if(checkoutbtn) checkoutbtn.addEventListener('click', checkout);
+
+  document.querySelectorAll('[data-field]').forEach(el=>{
+    el.addEventListener('change', ()=>{ updateProductField(el.getAttribute('data-id'), el.getAttribute('data-field'), el.value); });
+  });
+
+  document.querySelectorAll('[data-delete]').forEach(el=>{
+    el.addEventListener('click', ()=>{ deleteProduct(el.getAttribute('data-delete')); });
+  });
+
+  const addform = document.getElementById('addform');
+  if(addform){
+    addform.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      addProduct({
+        name: document.getElementById('new-name').value.trim(),
+        sku: document.getElementById('new-sku').value.trim(),
+        category: document.getElementById('new-category').value,
+        price: document.getElementById('new-price').value,
+        stock: document.getElementById('new-stock').value,
+        desc: document.getElementById('new-desc').value.trim(),
+        description: document.getElementById('new-desc').value.trim()
+      });
+      addform.reset();
+    });
+  }
+}
+
+init();
+</script>
+</body>
+</html>

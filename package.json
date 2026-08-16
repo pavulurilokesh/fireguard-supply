@@ -1,0 +1,22 @@
+{
+  "name": "fireguard-backend",
+  "version": "1.0.0",
+  "description": "FireGuard Supply Co. - fire safety equipment ordering app with real auth, hashed passwords, and a SQLite database.",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node scripts/smoke-test.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3"
+  }
+}

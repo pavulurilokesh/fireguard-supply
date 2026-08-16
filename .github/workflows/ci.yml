@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start server
+        env:
+          PORT: 3000
+          JWT_SECRET: ci_test_secret_not_for_production_use_only
+          DB_PATH: ./ci-test.db
+          SEED_ADMIN_USERNAME: admin
+          SEED_ADMIN_PASSWORD: ci_admin_password_123
+        run: node server.js &
+
+      - name: Run smoke test against the running server
+        env:
+          PORT: 3000
+          SEED_ADMIN_USERNAME: admin
+          SEED_ADMIN_PASSWORD: ci_admin_password_123
+        run: npm test
+
+      - name: Clean up test database
+        if: always()
+        run: rm -f ci-test.db ci-test.db-*
