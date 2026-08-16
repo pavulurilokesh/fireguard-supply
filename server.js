@@ -51,5 +51,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`FireGuard Supply Co. server running at http://localhost:${PORT}`);
+  console.log(`FireGuard Supply Co. server running at http://firesafety`);
 });
