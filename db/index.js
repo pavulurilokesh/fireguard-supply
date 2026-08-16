@@ -4,6 +4,14 @@ const { DatabaseSync } = require('node:sqlite');
 const bcrypt = require('bcryptjs');
 
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'fireguard.db');
+
+// Ensure the directory for the database file actually exists before opening it.
+// On platforms like Railway, this is usually a mounted volume (e.g. /data) —
+// if the volume isn't attached yet or DB_PATH points somewhere unexpected,
+// this creates the folder instead of crashing with ERR_SQLITE_ERROR.
+const dbDir = path.dirname(DB_PATH);
+fs.mkdirSync(dbDir, { recursive: true });
+
 const raw = new DatabaseSync(DB_PATH);
 raw.exec('PRAGMA journal_mode = WAL');
 raw.exec('PRAGMA foreign_keys = ON');
