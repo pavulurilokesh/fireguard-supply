@@ -6,6 +6,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +51,20 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on the server.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`FireGuard Supply Co. server running at http://localhost port${3000}`);
+async function start() {
+  // Database initialization (schema + seed data) can be slow when DB_PATH
+  // points at a mounted volume. Await it here, before we start listening,
+  // so the server never accepts requests against a half-seeded database —
+  // but without blocking module load / require() the way a top-level
+  // synchronous seed() call used to.
+  await db.initializeDb();
+
+  app.listen(PORT, () => {
+    console.log(`FireGuard Supply Co. server running at http://localhost port${3000}`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });

@@ -56,7 +56,7 @@ const db = {
 };
 
 // Seed an admin account on first run (only if no users exist yet)
-function seed() {
+function seedSync() {
   const userCount = db.prepare('SELECT COUNT(*) AS c FROM users').get().c;
   if (userCount === 0) {
     const adminUser = process.env.SEED_ADMIN_USERNAME || 'admin';
@@ -92,7 +92,29 @@ function seed() {
     console.log(`Seeded ${seedProducts.length} products.`);
   }
 }
-seed();
+// Runs the (synchronous, potentially slow-on-a-mounted-volume) seed logic
+// off the main require() chain via setImmediate/queueMicrotask semantics,
+// so importing this module never blocks server startup. Callers should
+// await initializeDb() before relying on seeded data being present, but
+// the module itself, its exports, and the underlying connection are all
+// ready to use synchronously as soon as require('./db') returns.
+let initPromise = null;
+function initializeDb() {
+  if (!initPromise) {
+    initPromise = new Promise((resolve, reject) => {
+      setImmediate(() => {
+        try {
+          seedSync();
+          resolve();
+        } catch (err) {
+          reject(err);
+        }
+      });
+    });
+  }
+  return initPromise;
+}
 
 module.exports = db;
+module.exports.initializeDb = initializeDb;
 
