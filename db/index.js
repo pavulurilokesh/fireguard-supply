@@ -12,20 +12,28 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, '..', 'fireguard.db'
 const dbDir = path.dirname(DB_PATH);
 fs.mkdirSync(dbDir, { recursive: true });
 
-const raw = new DatabaseSync(DB_PATH);
-raw.exec('PRAGMA journal_mode = WAL');
-raw.exec('PRAGMA foreign_keys = ON');
+let raw = null;
 
-// Run schema
-const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
-raw.exec(schema);
+// Initialize database synchronously on first call, then reuse the connection.
+function initDbConnection() {
+  if (!raw) {
+    raw = new DatabaseSync(DB_PATH);
+    raw.exec('PRAGMA journal_mode = WAL');
+    raw.exec('PRAGMA foreign_keys = ON');
+
+    // Run schema
+    const schema = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf8');
+    raw.exec(schema);
+  }
+  return raw;
+}
 
 // --- thin wrapper so the rest of the app can use a better-sqlite3-like API
 // (db.prepare(sql).get/all/run, plus a transaction() helper), while the
 // underlying driver stays Node's built-in, zero-native-dependency node:sqlite.
 const db = {
   prepare(sql) {
-    const stmt = raw.prepare(sql);
+    const stmt = initDbConnection().prepare(sql);
     return {
       get: (...params) => stmt.get(...params),
       all: (...params) => stmt.all(...params),
@@ -36,19 +44,19 @@ const db = {
     };
   },
   exec(sql) {
-    return raw.exec(sql);
+    return initDbConnection().exec(sql);
   },
   // Runs `fn` inside BEGIN/COMMIT, rolling back on any thrown error.
   // Mirrors the ergonomics of better-sqlite3's db.transaction(fn).
   transaction(fn) {
     return (...args) => {
-      raw.exec('BEGIN');
+      initDbConnection().exec('BEGIN');
       try {
         const result = fn(...args);
-        raw.exec('COMMIT');
+        initDbConnection().exec('COMMIT');
         return result;
       } catch (err) {
-        raw.exec('ROLLBACK');
+        initDbConnection().exec('ROLLBACK');
         throw err;
       }
     };
@@ -92,12 +100,10 @@ function seedSync() {
     console.log(`Seeded ${seedProducts.length} products.`);
   }
 }
-// Runs the (synchronous, potentially slow-on-a-mounted-volume) seed logic
-// off the main require() chain via setImmediate/queueMicrotask semantics,
-// so importing this module never blocks server startup. Callers should
-// await initializeDb() before relying on seeded data being present, but
-// the module itself, its exports, and the underlying connection are all
-// ready to use synchronously as soon as require('./db') returns.
+// Defer seeding to avoid blocking module load / require() chain.
+// The database connection itself is initialized lazily on first use,
+// and seeding happens asynchronously via setImmediate, so the app
+// can start listening before all data is seeded.
 let initPromise = null;
 function initializeDb() {
   if (!initPromise) {
@@ -107,6 +113,7 @@ function initializeDb() {
           seedSync();
           resolve();
         } catch (err) {
+          console.error('Database initialization error:', err);
           reject(err);
         }
       });

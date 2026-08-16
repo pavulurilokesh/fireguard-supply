@@ -52,19 +52,22 @@ app.use((err, req, res, next) => {
 });
 
 async function start() {
-  // Database initialization (schema + seed data) can be slow when DB_PATH
-  // points at a mounted volume. Await it here, before we start listening,
-  // so the server never accepts requests against a half-seeded database —
-  // but without blocking module load / require() the way a top-level
-  // synchronous seed() call used to.
-  await db.initializeDb();
+// Database seeding can be slow. Defer it so we start listening ASAP,
+// but await it before the server fully transitions to "healthy" so we
+// don't serve API requests against a half-seeded database.
+// (The lazy initializeDb() connection means the connection itself is also deferred.)
+db.initializeDb().catch((err) => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
+});
 
-  app.listen(PORT, () => {
-    console.log(`FireGuard Supply Co. server running at http://localhost port${3000}`);
-  });
+app.listen(PORT, () => {
+  console.log(`FireGuard Supply Co. server running at http://localhost:${PORT}`);
+});
 }
 
 start().catch((err) => {
   console.error('Failed to start server:', err);
   process.exit(1);
 });
+
