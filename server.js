@@ -6,6 +6,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +51,23 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong on the server.' });
 });
 
-app.listen(PORT, () => {
-  console.log(`FireGuard Supply Co. server running at http://localhost port${3000}`);
+async function start() {
+  // Database seeding can be slow. Defer it so we start listening ASAP,
+  // but await it before the server fully transitions to "healthy" so we
+  // don't serve API requests against a half-seeded database.
+  // (The lazy initDbConnection means the connection itself is also deferred.)
+  db.initializeDb().catch((err) => {
+    console.error('Failed to initialize database:', err);
+    process.exit(1);
+  });
+
+  app.listen(PORT, () => {
+    console.log(`FireGuard Supply Co. server running at http://localhost:${PORT}`);
+  });
+}
+
+start().catch((err) => {
+  console.error('Failed to start server:', err);
+  process.exit(1);
 });
+
